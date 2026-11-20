@@ -1,0 +1,253 @@
+{
+  "name": "Kaneo 2 Project Management (Postgres, S3 uploads)",
+  "idSeed": "Kaneo 2 Project Management (Postgres, S3 uploads)",
+  "description": "Kanban, list and timeline project tracking with a pre-created admin.",
+  "category": "Other",
+  "tags": [
+    "kaneo",
+    "project-management",
+    "kanban",
+    "jira-alternative",
+    "linear-alternative",
+    "tasks",
+    "self-hosted",
+    "postgres"
+  ],
+  "image": "https://cdn.jsdelivr.net/gh/selfhst/icons/svg/kaneo.svg",
+  "upstream": {
+    "repo": "usekaneo/kaneo",
+    "version": "v2.50.0",
+    "images": {
+      "kaneo": "ghcr.io/usekaneo/kaneo:2.50.0@sha256:03ad082e33945b9c091266af60c7c88865cb2fab37ff33d91cbbcab626b0094d (released 2026-11-19)",
+      "postgres": "ghcr.io/railwayapp-templates/postgres-ssl:18.6@sha256:4fc833b43d2aaf6ecc9b18615f5533602b723a32d0e2efe2dae8ca0f7217c863 (= :18)"
+    },
+    "checked": "2026-11-20"
+  },
+  "services": {
+    "Kaneo": {
+      "icon": "https://cdn.jsdelivr.net/gh/selfhst/icons/svg/kaneo.svg",
+      "source": {
+        "repo": "baranberkay96/kaneo-railway",
+        "rootDirectory": "/services/kaneo"
+      },
+      "startCommand": null,
+      "preDeployCommand": null,
+      "healthcheckPath": "/api/health",
+      "healthcheckTimeout": 600,
+      "restartPolicyType": "ALWAYS",
+      "numReplicas": 1,
+      "cronSchedule": null,
+      "publicDomain": true,
+      "targetPort": 5173,
+      "tcpProxy": null,
+      "volume": null,
+      "variables": {
+        "PORT": {
+          "defaultValue": "5173",
+          "description": "Port of Kaneo's web server (public domain target and healthcheck).",
+          "required": false
+        },
+        "KANEO_CLIENT_URL": {
+          "defaultValue": "https://${{RAILWAY_PUBLIC_DOMAIN}}",
+          "description": "Public URL of Kaneo. Change it when you add a custom domain; the API URL is derived from it.",
+          "required": false
+        },
+        "DATABASE_URL": {
+          "defaultValue": "${{Postgres.DATABASE_URL}}",
+          "description": "PostgreSQL connection over the private network. Kaneo applies its migrations on start.",
+          "required": false
+        },
+        "AUTH_SECRET": {
+          "defaultValue": "${{secret(64, \"abcdef0123456789\")}}",
+          "description": "Protects sign-in sessions (32+ chars). Keep it stable; changing it signs everyone out.",
+          "required": false
+        },
+        "KANEO_ADMIN_EMAIL": {
+          "defaultValue": "admin@example.com",
+          "description": "E-mail (login) of the first admin, created on the first start before the site opens. Change it later in Settings.",
+          "required": false
+        },
+        "KANEO_ADMIN_PASSWORD": {
+          "defaultValue": "${{secret(24, \"abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789\")}}",
+          "description": "Password of the first admin (8-128 chars). Generated; read it here to sign in. Used only on the first start.",
+          "required": false
+        },
+        "KANEO_ADMIN_NAME": {
+          "defaultValue": "Admin",
+          "description": "Display name of the first admin.",
+          "required": false
+        },
+        "DISABLE_REGISTRATION": {
+          "defaultValue": "true",
+          "description": "true = only invited people can create accounts. Set to false to let anyone with the URL sign up.",
+          "required": false
+        },
+        "DISABLE_EMAIL_OTP_SIGN_IN": {
+          "defaultValue": "true",
+          "description": "Keep password sign-in when you add SMTP (otherwise Kaneo switches to e-mailed codes).",
+          "required": false
+        },
+        "NOTIFICATION_SECRET_ENCRYPTION_KEY": {
+          "defaultValue": "${{secret(64, \"abcdef0123456789\")}}",
+          "description": "Encrypts saved notification tokens and webhook signing secrets. Keep it stable.",
+          "required": false
+        },
+        "S3_ENDPOINT": {
+          "defaultValue": "${{Bucket.ENDPOINT}}",
+          "description": "Railway Bucket S3 endpoint for task images and attachments (reached by the API and the browser).",
+          "required": false
+        },
+        "S3_BUCKET": {
+          "defaultValue": "${{Bucket.BUCKET}}",
+          "description": "Railway Bucket name.",
+          "required": false
+        },
+        "S3_ACCESS_KEY_ID": {
+          "defaultValue": "${{Bucket.ACCESS_KEY_ID}}",
+          "description": "Railway Bucket access key.",
+          "required": false
+        },
+        "S3_SECRET_ACCESS_KEY": {
+          "defaultValue": "${{Bucket.SECRET_ACCESS_KEY}}",
+          "description": "Railway Bucket secret key.",
+          "required": false
+        },
+        "S3_REGION": {
+          "defaultValue": "${{Bucket.REGION}}",
+          "description": "Railway Bucket region (used for signing).",
+          "required": false
+        },
+        "S3_FORCE_PATH_STYLE": {
+          "defaultValue": "false",
+          "description": "Railway Buckets use virtual-hosted-style URLs.",
+          "required": false
+        },
+        "S3_MAX_IMAGE_UPLOAD_BYTES": {
+          "defaultValue": "10485760",
+          "description": "Largest upload (images and attachments) in bytes. Default 10 MiB.",
+          "required": false
+        },
+        "S3_BUCKET_CORS": {
+          "defaultValue": "true",
+          "description": "Set the Bucket CORS rule for KANEO_CLIENT_URL on each start so browsers can upload. false = leave the rule alone.",
+          "required": false
+        },
+        "SMTP_HOST": {
+          "defaultValue": "",
+          "description": "Optional SMTP server for invitations and password resets (outbound SMTP needs Railway Pro).",
+          "required": false
+        },
+        "SMTP_PORT": {
+          "defaultValue": "",
+          "description": "Optional SMTP port, e.g. 587 or 465.",
+          "required": false
+        },
+        "SMTP_SECURE": {
+          "defaultValue": "",
+          "description": "Optional: true for implicit TLS (port 465).",
+          "required": false
+        },
+        "SMTP_USER": {
+          "defaultValue": "",
+          "description": "Optional SMTP user.",
+          "required": false
+        },
+        "SMTP_PASSWORD": {
+          "defaultValue": "",
+          "description": "Optional SMTP password.",
+          "required": false
+        },
+        "SMTP_FROM": {
+          "defaultValue": "",
+          "description": "Optional sender, e.g. Kaneo <kaneo@example.com>.",
+          "required": false
+        }
+      }
+    },
+    "Postgres": {
+      "icon": "https://devicons.railway.app/i/postgresql.svg",
+      "source": {
+        "image": "ghcr.io/railwayapp-templates/postgres-ssl:18.6@sha256:4fc833b43d2aaf6ecc9b18615f5533602b723a32d0e2efe2dae8ca0f7217c863"
+      },
+      "startCommand": null,
+      "preDeployCommand": null,
+      "healthcheckPath": null,
+      "healthcheckTimeout": null,
+      "restartPolicyType": "ON_FAILURE",
+      "restartPolicyMaxRetries": 10,
+      "numReplicas": 1,
+      "cronSchedule": null,
+      "publicDomain": false,
+      "targetPort": null,
+      "tcpProxy": null,
+      "volume": {
+        "mountPath": "/var/lib/postgresql/data"
+      },
+      "variables": {
+        "PGDATA": {
+          "defaultValue": "/var/lib/postgresql/data/pgdata",
+          "description": "Location where the database will be initialized",
+          "required": false
+        },
+        "PGHOST": {
+          "defaultValue": "${{RAILWAY_PRIVATE_DOMAIN}}",
+          "description": "Railway Private Domain Name.",
+          "required": false
+        },
+        "PGPORT": {
+          "defaultValue": "5432",
+          "description": "Port to connect to Postgres.",
+          "required": false
+        },
+        "PGUSER": {
+          "defaultValue": "${{ POSTGRES_USER }}",
+          "description": "Required variable for Data panel",
+          "required": false
+        },
+        "PGDATABASE": {
+          "defaultValue": "${{POSTGRES_DB}}",
+          "description": "Required variable for the data panel.",
+          "required": false
+        },
+        "PGPASSWORD": {
+          "defaultValue": "${{POSTGRES_PASSWORD}}",
+          "description": "Required variable for Data panel",
+          "required": false
+        },
+        "POSTGRES_DB": {
+          "defaultValue": "railway",
+          "description": "Default database created when image is started.",
+          "required": false
+        },
+        "DATABASE_URL": {
+          "defaultValue": "postgresql://${{PGUSER}}:${{POSTGRES_PASSWORD}}@${{RAILWAY_PRIVATE_DOMAIN}}:5432/${{PGDATABASE}}",
+          "description": "URL to connect to Postgres database.",
+          "required": false
+        },
+        "POSTGRES_USER": {
+          "defaultValue": "postgres",
+          "description": "User to connect to Postgres DB",
+          "required": false
+        },
+        "SSL_CERT_DAYS": {
+          "defaultValue": "820",
+          "description": "SSL certificate expiry in days.",
+          "required": false
+        },
+        "POSTGRES_PASSWORD": {
+          "defaultValue": "${{ secret(32, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\") }}",
+          "description": "Password to connect to DB",
+          "required": false
+        },
+        "RAILWAY_DEPLOYMENT_DRAINING_SECONDS": {
+          "defaultValue": "60",
+          "description": "Allow Postgres to cleanly shut down",
+          "required": false
+        }
+      }
+    }
+  },
+  "buckets": [
+    "Bucket"
+  ]
+}
