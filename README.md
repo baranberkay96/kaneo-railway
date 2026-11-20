@@ -1,5 +1,7 @@
 # Deploy and Host Kaneo with Railway
 
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/kaneo-2-project-management-postgres-s3-u?referralCode=20H68q)
+
 Kaneo is an open-source project management tool with kanban boards, list and timeline views, time tracking, labels, comments and integrations. This template runs Kaneo 2.50 with PostgreSQL 18 and a Railway Bucket for task images and attachments, and creates your admin account before the site goes online.
 
 ## About Hosting Kaneo
